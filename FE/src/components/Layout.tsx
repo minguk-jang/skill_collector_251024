@@ -1,13 +1,22 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Plus, Home, Search, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useSkillStore } from '../store/useSkillStore';
 
 export default function Layout() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
-  const categories = useSkillStore((state) => state.getCategories());
-  const tags = useSkillStore((state) => state.getTags());
+  const items = useSkillStore((state) => state.items);
+
+  const categories = useMemo(() => {
+    const cats = items.map((item) => item.category);
+    return Array.from(new Set(cats)).sort();
+  }, [items]);
+
+  const tags = useMemo(() => {
+    const allTags = items.flatMap((item) => item.tags);
+    return Array.from(new Set(allTags)).sort();
+  }, [items]);
 
   const isActive = (path: string) => location.pathname === path;
 
